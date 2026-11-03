@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>難忘的暑假：那座山與夏夜的星空</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        midnight: '#0b132b',
+                        deepspace: '#1c2541',
+                        starlight: '#f7d070',
+                        emeraldpeak: '#1c3829',
+                        mountainmist: '#3a506b'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Serif TC', 'serif'],
+                        serif: ['Noto Serif TC', 'Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Tone.js for Ambient Audio Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <style>
+        /* Custom Animations & Glows */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 15px rgba(247, 208, 112, 0.4);
+        }
+        
+        .card-blur {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b132b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a506b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f7d070;
+        }
+
+        /* Reading Progress Indicator */
+        #progress-bar {
+            transform-origin: 0%;
+        }
+    </style>
+</head>
+<body class="bg-midnight text-slate-100 font-serif antialiased selection:bg-starlight selection:text-midnight min-h-screen relative overflow-x-hidden">
+
+    <!-- Canvas Background for Starry Night Sky -->
+    <canvas id="starry-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Reading Progress Bar -->
+    <div class="fixed top-0 left-0 w-full h-1 z-50 bg-gray-900/40">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-teal-400 via-starlight to-amber-300 w-full scale-x-0 transition-transform duration-75 ease-out"></div>
+    </div>
+
+    <!-- Floating Top Navigation & Utilities -->
+    <header class="fixed top-4 inset-x-0 max-w-5xl mx-auto px-4 z-40">
+        <nav class="bg-deepspace/70 border border-slate-700/50 rounded-2xl p-3 px-6 card-blur flex items-center justify-between shadow-2xl">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-starlight to-amber-500 flex items-center justify-center text-midnight shadow-md font-bold">
+                    <i data-lucide="mountain" class="w-4 h-4"></i>
+                </div>
+                <span class="text-sm md:text-base font-semibold tracking-wider text-slate-200">夏日記憶冊</span>
+            </div>
+
+            <!-- Interactive Toolbar Controls -->
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <!-- Ambient Audio Toggle -->
+                <button id="audio-btn" class="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-600/50 text-xs text-slate-300 transition-all duration-300 hover:text-starlight" title="開啟/關閉環境音效">
+                    <i id="audio-icon" data-lucide="volume-x" class="w-4 h-4"></i>
+                    <span id="audio-text" class="hidden sm:inline">微風星空聲</span>
+                </button>
+
+                <!-- Font Size Adjustment -->
+                <div class="flex items-center bg-slate-800/80 rounded-xl border border-slate-600/50 p-1 text-xs text-slate-300">
+                    <button id="font-dec" class="p-1 hover:text-starlight transition-colors" title="縮小字體">
+                        <i data-lucide="minus" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <span id="font-size-label" class="px-2 font-mono text-[11px] text-slate-400">中</span>
+                    <button id="font-inc" class="p-1 hover:text-starlight transition-colors" title="放大字體">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+
+                <!-- Theme / Info Quick Icon -->
+                <a href="#essay-content" class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-600/50 text-slate-300 hover:text-starlight transition-all">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Header Section -->
+    <section class="relative min-h-screen flex flex-col justify-center items-center px-4 pt-24 pb-16 text-center z-10">
+        <!-- Decorative Glow -->
+        <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-starlight/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-3xl mx-auto space-y-6 animate-float">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-starlight/10 border border-starlight/30 text-starlight text-xs md:text-sm tracking-widest font-sans uppercase">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> 暑假難忘回憶 • 八百字隨筆
+            </span>
+
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-amber-100 to-starlight text-glow leading-tight py-2">
+                難忘的暑假：<br class="hidden sm:inline">那座山與夏夜的星空
+            </h1>
+
+            <p class="text-slate-400 text-sm md:text-base max-w-xl mx-auto font-sans leading-relaxed">
+                每當炎炎夏日的蟬鳴再次響起，我的腦海總會浮現出那個特別的暑假。攀登合歡山的汗水，與夜晚漫天璀璨的銀河，成了青春裡最亮眼的一筆。
+            </p>
+
+            <div class="pt-6 flex justify-center items-center gap-6 text-xs text-slate-400 font-sans">
+                <span class="flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4 text-starlight"></i> 高中學生作</span>
+                <span class="flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4 text-starlight"></i> 閱讀時間約 4 分鐘</span>
+                <span class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-4 h-4 text-starlight"></i> 合歡山百岳</span>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-500 hover:text-starlight transition-colors">
+            <span class="text-xs tracking-widest uppercase font-sans">向下滾動閱讀</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 animate-bounce"></i>
+        </div>
+    </section>
+
+    <!-- Main Essay Content Section -->
+    <main id="essay-content" class="relative z-10 max-w-4xl mx-auto px-4 py-12">
+        <!-- Article Card Container -->
+        <article class="bg-deepspace/50 border border-slate-700/60 rounded-3xl p-6 md:p-12 shadow-2xl card-blur relative">
+            
+            <!-- Article Header Badge -->
+            <div class="flex items-center justify-between pb-8 mb-8 border-b border-slate-700/60 font-sans text-xs text-slate-400">
+                <span class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    原創感悟散文
+                </span>
+                <button id="copy-text-btn" class="flex items-center gap-1 hover:text-starlight transition-colors">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> 複製全文
+                </button>
+            </div>
+
+            <!-- Dynamic Typography Essay Body -->
+            <div id="article-body" class="text-slate-200 leading-loose space-y-8 text-base md:text-lg tracking-wide">
+                
+                <!-- Paragraph 1 -->
+                <p class="first-letter:text-4xl first-letter:font-bold first-letter:text-starlight first-letter:mr-2 first-letter:float-left">
+                    每當炎炎夏日的蟬鳴再次響起，我的腦海總會浮現出那個特別的暑假。對許多人來說，暑假或許是冷氣房裡的電玩時光，或是沙灘上的歡聲笑笑；但對我而言，最難忘的回憶，莫過於那個夏天與家人一起挑戰百岳、攀登合歡山的旅程。
+                </p>
+
+                <!-- Paragraph 2 -->
+                <p>
+                    那是我第一次嘗試高山徒步。出發前，我心裡充滿了雀躍與期待，想像著自己站在山頂俯瞰雲海的英姿。然而，現實總是比想像來得艱辛。當我們真正踏上步道，高海拔帶來的稀薄空氣很快就讓我感到氣喘籲籲，雙腿像是灌了鉛一樣沉重。看著陡峭無盡的階梯，我的熱情在汗水中一點一滴地消耗殆盡，心中甚至動了放棄的念頭，抱怨著為什麼要自討苦吃。
+                </p>
+
+                <!-- Highlight Quote Block -->
+                <blockquote class="my-8 p-6 rounded-2xl bg-gradient-to-r from-starlight/10 to-transparent border-l-4 border-starlight italic text-starlight/90 text-lg md:text-xl font-serif leading-relaxed">
+                    「爬山就像面對生活中的挑戰，最累的時候，往往代表你距離頂峰不遠了。不用急，看著腳下，一步一步來。」
+                </blockquote>
+
+                <!-- Paragraph 3 -->
+                <p>
+                    就在我停下腳步、氣餒地垂下頭時，爸爸走到了我的身邊。他沒有說大道理，只是輕輕拍了拍我的肩膀，遞給我一口溫水，並指著前方的山脊鼓勵我。看著爸媽堅定的眼神，我深吸了一口清涼的空氣，重新鼓起勇氣，邁開步伐。
+                </p>
+
+                <!-- Paragraph 4 -->
+                <p>
+                    終於，經過幾個小時的咬牙堅持，我們順利登上了山頂。那一刻，所有的疲憊煙消雲散。呈現在眼前的是無邊無際的湛藍天空與層層疊疊的綠色山巒，山風拂過臉龐，帶走身上的熱氣與汗水，取而代之的是一種從未體驗過的平靜與成就感。
+                </p>
+
+                <!-- Paragraph 5 -->
+                <p>
+                    到了夜晚，我們住在山上的小屋。當我走出戶外，抬頭看那一瞬間，眼前的景象徹底震撼了我——那是沒有都市霓虹干擾的夜空，數以萬計的星星如鑽石般撒落在黑絨布般的夜幕上，甚至能清晰地看見橫跨天際的銀河。那一晚，我們圍坐在一起看星空、聊著未來的夢想，時間彷彿在這一刻靜止。
+                </p>
+
+                <!-- Paragraph 6 (Conclusion) -->
+                <p class="pt-4 border-t border-slate-700/40 font-semibold text-slate-100">
+                    這個暑假，我不僅收穫了一段美麗的風景，更學會了堅持與沉著。每當我在生活中遇到困難與挫折時，總會想起那個夏夜的星空，以及自己在山道上一步步堅持到底的腳步。這段難忘的暑假回憶，將會成為我青春歲月中，最璀璨亮眼的一筆力量。
+                </p>
+
+            </div>
+
+        </article>
+    </main>
+
+    <!-- Photo Memory Gallery Section -->
+    <section class="relative z-10 max-w-5xl mx-auto px-4 py-16">
+        <div class="text-center mb-12 space-y-3">
+            <span class="text-starlight text-xs tracking-widest uppercase font-sans">Memory Gallery</span>
+            <h2 class="text-3xl font-bold text-slate-100">旅程記憶圖鑑</h2>
+            <p class="text-slate-400 text-sm">定格山巔風光與夏夜閃耀的瞬間</p>
+        </div>
+
+        <!-- Grid Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Card 1 -->
+            <div class="group relative rounded-2xl overflow-hidden bg-deepspace border border-slate-700/60 shadow-lg hover:border-starlight/50 transition-all duration-300 transform hover:-translate-y-2">
+                <div class="h-56 bg-slate-800 relative overflow-hidden">
+                    <!-- SVG Visual Placeholder for Climbing -->
+                    <svg class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" viewBox="0 0 400 250" fill="none">
+                        <rect width="400" height="250" fill="#1c2541"/>
+                        <path d="M0 250 L120 120 L220 180 L400 80 L400 250 Z" fill="#3a506b" opacity="0.6"/>
+                        <path d="M0 250 L180 90 L280 150 L400 50 L400 250 Z" fill="#1c3829"/>
+                        <circle cx="320" cy="70" r="25" fill="#f7d070" opacity="0.8"/>
+                        <!-- Climber silhouettes -->
+                        <circle cx="140" cy="125" r="4" fill="#ffffff"/>
+                        <path d="M140 129 L140 145 M140 135 L133 140 M140 135 L147 138" stroke="#ffffff" stroke-width="2"/>
+                    </svg>
+                    <div class="absolute inset-0 bg-gradient-to-t from-deepspace via-transparent to-transparent opacity-80"></div>
+                </div>
+                <div class="p-5 space-y-2">
+                    <span class="text-xs text-starlight font-sans font-medium">第一站 • 艱辛腳步</span>
+                    <h3 class="text-lg font-bold text-slate-100">陡峭步道上的咬牙堅持</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed">高海拔的稀薄空氣與灌鉛般的雙腿，是考驗意志力的第一道關卡。</p>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="group relative rounded-2xl overflow-hidden bg-deepspace border border-slate-700/60 shadow-lg hover:border-starlight/50 transition-all duration-300 transform hover:-translate-y-2">
+                <div class="h-56 bg-slate-800 relative overflow-hidden">
+                    <!-- SVG Visual Placeholder for Summit View -->
+                    <svg class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" viewBox="0 0 400 250" fill="none">
+                        <rect width="400" height="250" fill="#0b132b"/>
+                        <!-- Clouds & Peaks -->
+                        <path d="M-20 180 Q60 120 160 160 T340 140 T420 170 L420 250 L-20 250 Z" fill="#3a506b" opacity="0.5"/>
+                        <path d="M-20 210 Q80 160 200 190 T420 180 L420 250 L-20 250 Z" fill="#1c3829"/>
+                        <path d="M0 160 C100 130 150 110 250 140 C350 170 380 120 400 130 L400 250 L0 250 Z" fill="#5bc0be" opacity="0.3"/>
+                        <circle cx="200" cy="60" r="30" fill="#f7d070" opacity="0.9"/>
+                    </svg>
+                    <div class="absolute inset-0 bg-gradient-to-t from-deepspace via-transparent to-transparent opacity-80"></div>
+                </div>
+                <div class="p-5 space-y-2">
+                    <span class="text-xs text-starlight font-sans font-medium">第二站 • 登頂俯瞰</span>
+                    <h3 class="text-lg font-bold text-slate-100">雲海與湛藍的山頂風光</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed">站上高峰，山風拂過臉龐，疲憊煙消雲散，只留下萬丈豪情。</p>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="group relative rounded-2xl overflow-hidden bg-deepspace border border-slate-700/60 shadow-lg hover:border-starlight/50 transition-all duration-300 transform hover:-translate-y-2">
+                <div class="h-56 bg-slate-800 relative overflow-hidden">
+                    <!-- SVG Visual Placeholder for Milky Way Starry Night -->
+                    <svg class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" viewBox="0 0 400 250" fill="none">
+                        <rect width="400" height="250" fill="#080c19"/>
+                        <!-- Stars -->
+                        <circle cx="50" cy="40" r="1.5" fill="#fff" opacity="0.9"/>
+                        <circle cx="120" cy="80" r="2" fill="#f7d070" opacity="0.8"/>
+                        <circle cx="220" cy="30" r="1.5" fill="#fff" opacity="0.7"/>
+                        <circle cx="310" cy="70" r="2.5" fill="#fff" opacity="0.9"/>
+                        <circle cx="370" cy="40" r="1" fill="#fff" opacity="0.6"/>
+                        <!-- Milky Way diagonal stripe -->
+                        <path d="M50 0 L250 250 L350 250 L150 0 Z" fill="url(#milkyway)" opacity="0.4"/>
+                        <!-- Mountain Outline -->
+                        <path d="M0 250 L150 160 L280 210 L400 150 L400 250 Z" fill="#0b132b"/>
+                        <defs>
+                            <linearGradient id="milkyway" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#5bc0be"/>
+                                <stop offset="50%" stop-color="#f7d070"/>
+                                <stop offset="100%" stop-color="#3a506b"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="absolute inset-0 bg-gradient-to-t from-deepspace via-transparent to-transparent opacity-80"></div>
+                </div>
+                <div class="p-5 space-y-2">
+                    <span class="text-xs text-starlight font-sans font-medium">終點站 • 夜幕星空</span>
+                    <h3 class="text-lg font-bold text-slate-100">璀璨如鑽石般的銀河夜幕</h3>
+                    <p class="text-slate-400 text-xs leading-relaxed">遠離都市喧囂，抬頭仰望數以萬計的星辰，感受歲月靜好。</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Reflection Interactive Quote Card Section -->
+    <section class="relative z-10 max-w-4xl mx-auto px-4 py-12">
+        <div class="bg-gradient-to-br from-deepspace via-slate-900 to-emeraldpeak/40 border border-slate-700/60 rounded-3xl p-8 md:p-12 text-center space-y-6 shadow-2xl">
+            <i data-lucide="quote" class="w-10 h-10 text-starlight/60 mx-auto"></i>
+            <h3 class="text-2xl md:text-3xl font-bold text-slate-100">「這段回憶，將成為青春中最亮眼的力量。」</h3>
+            <p class="text-slate-300 text-sm md:text-base max-w-2xl mx-auto leading-relaxed font-sans">
+                每一次登頂都是自我超越的證明，每一顆夏夜的繁星都在提醒我們，只要腳踏實地，終能遇見最璀璨的光芒。
+            </p>
+            <div class="pt-4">
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-starlight text-midnight font-semibold font-sans hover:bg-amber-300 transition-all duration-300 shadow-lg hover:shadow-starlight/20">
+                    <i data-lucide="arrow-up" class="w-4 h-4"></i> 回到頂部重新閱讀
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-slate-800 mt-20 py-8 text-center font-sans text-xs text-slate-500">
+        <p>© 2026 夏日難忘回憶紀錄網頁 • Crafted for Youth Summer Memories</p>
+    </footer>
+
+    <!-- Notification Toast Container -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-starlight text-midnight font-sans text-sm font-semibold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 pointer-events-none">
+        <i data-lucide="check-circle" class="w-4 h-4"></i>
+        <span id="toast-msg">已成功複製全文</span>
+    </div>
+
+    <!-- Application Logic & Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        /* ============================================================
+           1. Canvas Ambient Starry Sky Particle Animation
+           ============================================================ */
+        const canvas = document.getElementById('starry-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const count = Math.floor((canvas.width * canvas.height) / 3000);
+            for (let i = 0; i < count; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    alpha: Math.random(),
+                    speed: Math.random() * 0.015 + 0.005
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.alpha += star.speed;
+                if (star.alpha > 1 || star.alpha < 0) {
+                    star.speed = -star.speed;
+                }
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(247, 208, 112, ${Math.max(0, star.alpha * 0.85)})`;
+                ctx.fill();
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawStars();
+
+        /* ============================================================
+           2. Scroll Reading Progress Indicator
+           ============================================================ */
+        const progressBar = document.getElementById('progress-bar');
+        window.addEventListener('scroll', () => {
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (window.scrollY / totalHeight);
+            progressBar.style.transform = `scaleX(${Math.min(Math.max(progress, 0), 1)})`;
+        });
+
+        /* ============================================================
+           3. Dynamic Font Size Adjustment
+           ============================================================ */
+        const articleBody = document.getElementById('article-body');
+        const fontDecBtn = document.getElementById('font-dec');
+        const fontIncBtn = document.getElementById('font-inc');
+        const fontSizeLabel = document.getElementById('font-size-label');
+
+        const fontSizes = [
+            { label: '小', class: 'text-sm md:text-base' },
+            { label: '中', class: 'text-base md:text-lg' },
+            { label: '大', class: 'text-lg md:text-xl' }
+        ];
+        let currentFontIdx = 1;
+
+        function updateFontSize() {
+            fontSizes.forEach(item => articleBody.classList.remove(...item.class.split(' ')));
+            articleBody.classList.add(...fontSizes[currentFontIdx].class.split(' '));
+            fontSizeLabel.textContent = fontSizes[currentFontIdx].label;
+        }
+
+        fontIncBtn.addEventListener('click', () => {
+            if (currentFontIdx < fontSizes.length - 1) {
+                currentFontIdx++;
+                updateFontSize();
+            }
+        });
+
+        fontDecBtn.addEventListener('click', () => {
+            if (currentFontIdx > 0) {
+                currentFontIdx--;
+                updateFontSize();
+            }
+        });
+
+        /* ============================================================
+           4. Ambient Night Wind & Soft Synthesizer Sound (Tone.js)
+           ============================================================ */
+        let isAudioPlaying = false;
+        let noiseNode = null;
+        let filterNode = null;
+        let synthNode = null;
+        let loopEvent = null;
+
+        const audioBtn = document.getElementById('audio-btn');
+        const audioIcon = document.getElementById('audio-icon');
+        const audioText = document.getElementById('audio-text');
+
+        async function initAudio() {
+            await Tone.start();
+            
+            // Soft Wind Simulation via Pink Noise + Filter
+            noiseNode = new Tone.Noise("pink").start();
+            filterNode = new Tone.Filter({
+                frequency: 200,
+                type: "lowpass",
+                rolloff: -24
+            }).toDestination();
+            noiseNode.connect(filterNode);
+            noiseNode.volume.value = -25;
+
+            // Soft Ambient Chime Synth for Star Effect
+            synthNode = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "sine" },
+                envelope: { attack: 2, decay: 3, sustain: 0.4, release: 4 }
+            }).toDestination();
+            synthNode.volume.value = -18;
+
+            // Random Chime Loop
+            const chords = [["C4", "E4", "G4"], ["A3", "C4", "E4"], ["F3", "A3", "C4"], ["G3", "B3", "D4"]];
+            loopEvent = new Tone.Loop(time => {
+                const randomChord = chords[Math.floor(Math.random() * chords.length)];
+                synthNode.triggerAttackRelease(randomChord, "4n", time);
+            }, "6n");
+            Tone.Transport.bpm.value = 40;
+        }
+
+        audioBtn.addEventListener('click', async () => {
+            if (!noiseNode) {
+                await initAudio();
+            }
+
+            if (!isAudioPlaying) {
+                Tone.Transport.start();
+                if (loopEvent) loopEvent.start(0);
+                isAudioPlaying = true;
+                audioBtn.classList.add('border-starlight', 'text-starlight');
+                audioText.textContent = "播放中";
+                audioIcon.setAttribute('data-lucide', 'volume-2');
+            } else {
+                Tone.Transport.stop();
+                if (loopEvent) loopEvent.stop();
+                noiseNode.volume.rampTo(-Infinity, 1);
+                isAudioPlaying = false;
+                audioBtn.classList.remove('border-starlight', 'text-starlight');
+                audioText.textContent = "微風星空聲";
+                audioIcon.setAttribute('data-lucide', 'volume-x');
+            }
+            lucide.createIcons();
+        });
+
+        /* ============================================================
+           5. Copy Essay Text Feature
+           ============================================================ */
+        const copyBtn = document.getElementById('copy-text-btn');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+
+        copyBtn.addEventListener('click', () => {
+            const paragraphs = Array.from(articleBody.querySelectorAll('p, blockquote'))
+                .map(el => el.innerText)
+                .join('\n\n');
+
+            // Fallback execCommand for iframe safety
+            const dummy = document.createElement('textarea');
+            document.body.appendChild(dummy);
+            dummy.value = paragraphs;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+
+            showToast('文章已成功複製到剪貼簿！');
+        });
+
+        function showToast(message) {
+            toastMsg.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
